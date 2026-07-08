@@ -30,6 +30,14 @@ It also provides an optional `omni.ui` FindSurface parameter-window utility.
 Apps may choose to use that utility, or they may build their own parameter UI
 and call the core detection API directly.
 
+
+## Samples
+
+These are the samples to help you get started to make your application with the library (more samples are to be added in the future):
+
+- [Omniverse Demo](https://github.com/CurvSurf/FindSurfaceOmniverseDemo)
+
+
 ## Public Python API
 
 Core detection symbols are available from `findsurface.bootstrap` without
