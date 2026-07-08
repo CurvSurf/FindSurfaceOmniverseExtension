@@ -1,0 +1,63 @@
+#usda 1.0
+(
+    customLayerData = {
+        string libraryName = "findsurfaceUsdSchemas"
+        string libraryPath = ""
+    }
+)
+
+class "FindSurfaceGeometryExportAPI" (
+    inherits = </APISchemaBase>
+    customData = {
+        token apiSchemaType = "singleApply"
+        string className = "FindSurfaceGeometryExportAPI"
+    }
+)
+{
+    custom string findsurface:app_id
+    custom int findsurface:schema_version
+    custom string findsurface:kind
+    custom int findsurface:source_point_count
+    custom bool findsurface:includes_visualization_meshes
+}
+
+class "FindSurfaceDetectionResultAPI" (
+    inherits = </APISchemaBase>
+    customData = {
+        token apiSchemaType = "singleApply"
+        string className = "FindSurfaceDetectionResultAPI"
+    }
+)
+{
+    custom string findsurface:id
+    custom string findsurface:geometry_type
+    custom double findsurface:rms_error
+    custom double findsurface:measurement_accuracy
+    custom int findsurface:seed_index
+    custom double3 findsurface:seed_position
+    custom int[] findsurface:inlier_indices
+    custom double findsurface:confidence
+    custom string findsurface:parameters_json
+}
+
+class "FindSurfaceInlierPointsAPI" (
+    inherits = </APISchemaBase>
+    customData = {
+        token apiSchemaType = "singleApply"
+        string className = "FindSurfaceInlierPointsAPI"
+    }
+)
+{
+    int64[] ids
+}
+
+class "FindSurfaceVisualizationAPI" (
+    inherits = </APISchemaBase>
+    customData = {
+        token apiSchemaType = "singleApply"
+        string className = "FindSurfaceVisualizationAPI"
+    }
+)
+{
+    rel material:binding
+}

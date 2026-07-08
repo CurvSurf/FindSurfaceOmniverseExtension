@@ -1,0 +1,13 @@
+[package]
+version = "1.0.0"
+title = "FindSurface Omniverse Core"
+description = "Reusable FindSurface native SDK wrapper, detection core API, optional parameter window utility, and USD schema resources for Omniverse Kit."
+category = "Geometry"
+keywords = ["findsurface", "geometry-detection", "native-sdk", "usd-schema"]
+
+[dependencies]
+"omni.ui" = {}
+"omni.usd" = {}
+
+[[python.module]]
+name = "findsurface.bootstrap.bootstrap_extension"

@@ -1,0 +1,46 @@
+{
+  "Plugins": [
+    {
+      "Info": {
+        "Types": {
+          "FindSurfaceDetectionResultAPI": {
+            "apiSchemaType": "singleApply",
+            "bases": [
+              "UsdAPISchemaBase"
+            ],
+            "schemaIdentifier": "FindSurfaceDetectionResultAPI",
+            "schemaKind": "singleApplyAPI"
+          },
+          "FindSurfaceGeometryExportAPI": {
+            "apiSchemaType": "singleApply",
+            "bases": [
+              "UsdAPISchemaBase"
+            ],
+            "schemaIdentifier": "FindSurfaceGeometryExportAPI",
+            "schemaKind": "singleApplyAPI"
+          },
+          "FindSurfaceInlierPointsAPI": {
+            "apiSchemaType": "singleApply",
+            "bases": [
+              "UsdAPISchemaBase"
+            ],
+            "schemaIdentifier": "FindSurfaceInlierPointsAPI",
+            "schemaKind": "singleApplyAPI"
+          },
+          "FindSurfaceVisualizationAPI": {
+            "apiSchemaType": "singleApply",
+            "bases": [
+              "UsdAPISchemaBase"
+            ],
+            "schemaIdentifier": "FindSurfaceVisualizationAPI",
+            "schemaKind": "singleApplyAPI"
+          }
+        }
+      },
+      "Name": "findsurfaceUsdSchemas",
+      "ResourcePath": "resources",
+      "Root": "..",
+      "Type": "resource"
+    }
+  ]
+}
