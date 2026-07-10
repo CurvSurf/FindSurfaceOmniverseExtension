@@ -72,7 +72,6 @@ class FindSurfaceWindowTests(unittest.TestCase):
 
     def test_build_findsurface_window_delegates_app_owned_controls(self):
         calls = []
-        auto_detect = object()
         lateral_extension = object()
         radial_expansion = object()
 
@@ -82,7 +81,6 @@ class FindSurfaceWindowTests(unittest.TestCase):
             build_parameter_pad_row=lambda: calls.append(("pad", (), {})),
         )
         models = findsurface_window.FindSurfaceWindowModels(
-            auto_detect=auto_detect,
             lateral_extension=lateral_extension,
             radial_expansion=radial_expansion,
         )
@@ -105,8 +103,7 @@ class FindSurfaceWindowTests(unittest.TestCase):
         self.assertEqual(calls[4][2]["name"], "radial_expansion")
         self.assertEqual(calls[-1][0], "pad")
         checkboxes = [event for event in EVENTS if event[0] == "CheckBox"]
-        self.assertEqual(len(checkboxes), 1)
-        self.assertIs(checkboxes[0][1]["model"], auto_detect)
+        self.assertEqual(checkboxes, [])
 
     def test_build_findsurface_window_accepts_legacy_mapping_models(self):
         calls = []
@@ -118,7 +115,6 @@ class FindSurfaceWindowTests(unittest.TestCase):
 
         findsurface_window.build_findsurface_window(
             {
-                "auto_detect": object(),
                 "lateral_extension": object(),
                 "radial_expansion": object(),
             },

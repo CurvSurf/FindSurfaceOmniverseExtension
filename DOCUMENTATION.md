@@ -412,7 +412,6 @@ from findsurface.bootstrap import (
 
 Model keys required by `FindSurfaceWindowModels.from_mapping()`:
 
-- `auto_detect`
 - `lateral_extension`
 - `radial_expansion`
 
@@ -432,7 +431,6 @@ callbacks = FindSurfaceWindowCallbacks(
 )
 
 models = FindSurfaceWindowModels.from_mapping({
-    "auto_detect": auto_detect_model,
     "lateral_extension": lateral_extension_model,
     "radial_expansion": radial_expansion_model,
 })
@@ -442,7 +440,6 @@ build_findsurface_window(models, callbacks)
 
 The builder assembles controls for:
 
-- `auto_detect`
 - `measurement_accuracy`
 - `mean_distance`
 - `seed_radius`

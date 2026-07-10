@@ -7,14 +7,12 @@ from .ui_views import BorderedGroupView
 
 @dataclass(frozen=True)
 class FindSurfaceWindowModels:
-    auto_detect: object
     lateral_extension: object
     radial_expansion: object
 
     @classmethod
     def from_mapping(cls, models):
         return cls(
-            auto_detect=models["auto_detect"],
             lateral_extension=models["lateral_extension"],
             radial_expansion=models["radial_expansion"],
         )
@@ -43,10 +41,6 @@ def build_findsurface_window(models, callbacks):
 
     with ui.VStack(spacing=8):
         ui.Spacer(height=8)
-        with ui.HStack(height=26, spacing=6):
-            ui.CheckBox(model=window_models.auto_detect, width=22)
-            ui.Label("Enable Hover Preview")
-        ui.Spacer(height=2)
         with BorderedGroupView("Measurement Parameters", row_heights=(76, 76)):
             callbacks.range_float_row("Accuracy", "measurement_accuracy", framed=False)
             callbacks.range_float_row("Mean Distance", "mean_distance", framed=False)
