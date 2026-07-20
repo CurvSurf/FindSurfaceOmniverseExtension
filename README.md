@@ -30,6 +30,8 @@ It also provides an optional `omni.ui` FindSurface parameter-window utility.
 Apps may choose to use that utility, or they may build their own parameter UI
 and call the core detection API directly.
 
+See [DOCUMENTATION.md](DOCUMENTATION.md) for the full API reference, usage
+requirements, and examples.
 
 ## Samples
 

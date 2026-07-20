@@ -100,6 +100,18 @@ Windows: exts/com.findsurface.bootstrap/data/native/windows-x86_64/FindSurface.d
 Linux:   exts/com.findsurface.bootstrap/data/native/linux-x86_64/libFindSurface.so
 ```
 
+## Threading
+
+The native FindSurface SDK does **not** support concurrent detection calls. This
+is an intentional SDK limitation: if a second thread starts a detection while
+another detection is in progress, both detections can fail.
+
+This extension therefore does not provide a thread-safe detection API or
+internally queue concurrent requests. Applications must serialize every
+`FindSurfaceDetector.detect()` call so that only one FindSurface detection is
+running at a time. Treat this as a process-wide requirement, including when
+using multiple detector or provider instances.
+
 ## Public Python API
 
 Import the core API from `findsurface.bootstrap`:
