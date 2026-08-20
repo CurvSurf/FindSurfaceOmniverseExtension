@@ -11,8 +11,11 @@ class FindSurfaceDetector:
 
     def __init__(self, provider=None):
         self._provider = provider or NativeFindSurfaceProvider()
+        self._closed = False
 
     def detect(self, points, seed_index, options=None, active_mask=None, active_generation=None):
+        if self._closed:
+            raise RuntimeError("FindSurface detector is closed.")
         options = normalize_detection_options(options)
         active_mask = _normalize_active_mask(points, active_mask)
         result = self._provider.detect(
@@ -26,6 +29,14 @@ class FindSurfaceDetector:
         if active_generation is not None:
             core_result.active_generation = int(active_generation)
         return core_result
+
+    def close(self):
+        if self._closed:
+            return
+        self._closed = True
+        close = getattr(self._provider, "close", None)
+        if close is not None:
+            close()
 
 
 def normalize_detection_options(options=None):

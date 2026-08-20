@@ -12,6 +12,7 @@ sys.path.insert(0, str(EXTENSION_ROOT))
 from findsurface.bootstrap.findsurface_sdk.constants import FsFeatureType  # noqa: E402
 from findsurface.bootstrap.native import (  # noqa: E402
     DetectionOptions,
+    FindSurfaceError,
     NativeFindSurfaceProvider,
     ValidationError,
     convert_raw_result,
@@ -24,10 +25,13 @@ class FakeSdk:
         self.float_parameters = []
         self.int_parameters = []
         self.bool_parameters = []
+        self.created_contexts = []
         self.released_contexts = []
 
     def create_context(self):
-        return "ctx"
+        context = f"ctx-{len(self.created_contexts) + 1}"
+        self.created_contexts.append(context)
+        return context
 
     def release_context(self, context):
         self.released_contexts.append(context)
@@ -166,25 +170,46 @@ class NativeDetectionTests(unittest.TestCase):
         self.assertAlmostEqual(parameters["tube_radius"], 0.25)
         self.assertAlmostEqual(parameters["sweep_angle"], 2.0 * pi)
 
-    def test_provider_returns_core_result_without_preview_type(self):
+    def test_provider_reuses_context_until_closed(self):
         sdk = FakeSdk()
         provider = NativeFindSurfaceProvider(sdk=sdk)
         points = [(0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (2.0, 0.0, 0.0)]
 
-        result = provider.detect(
+        first_result = provider.detect(
             points,
             [True, True, True],
             0,
             DetectionOptions(detection_type="Sphere", measurement_accuracy=0.004),
             active_generation=9,
         )
+        second_result = provider.detect(
+            points,
+            [True, True, True],
+            0,
+            DetectionOptions(detection_type="Sphere", measurement_accuracy=0.004),
+            active_generation=10,
+        )
 
-        self.assertIsInstance(result, FindSurfaceResult)
-        self.assertEqual(result.id, "Sphere_001")
-        self.assertEqual(result.inlier_indices, [0, 2])
-        self.assertEqual(result.active_generation, 9)
-        self.assertAlmostEqual(result.measurement_accuracy, 0.004)
-        self.assertEqual(sdk.released_contexts, ["ctx"])
+        self.assertIsInstance(first_result, FindSurfaceResult)
+        self.assertEqual(first_result.id, "Sphere_001")
+        self.assertEqual(first_result.inlier_indices, [0, 2])
+        self.assertEqual(first_result.active_generation, 9)
+        self.assertAlmostEqual(first_result.measurement_accuracy, 0.004)
+        self.assertEqual(second_result.id, "Sphere_002")
+        self.assertEqual(sdk.created_contexts, ["ctx-1"])
+        self.assertEqual(sdk.released_contexts, [])
+
+        provider.close()
+        provider.close()
+
+        self.assertEqual(sdk.released_contexts, ["ctx-1"])
+        with self.assertRaisesRegex(FindSurfaceError, "closed"):
+            provider.detect(
+                points,
+                [True, True, True],
+                0,
+                DetectionOptions(detection_type="Sphere"),
+            )
 
 
 if __name__ == "__main__":
