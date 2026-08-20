@@ -49,12 +49,18 @@ constructing any app UI:
 from findsurface.bootstrap import DetectionOptions, FindSurfaceDetector
 
 detector = FindSurfaceDetector()
-result = detector.detect(
-    points=[(0.0, 0.0, 0.0), (1.0, 0.0, 0.0)],
-    seed_index=0,
-    options=DetectionOptions(detection_type="Auto"),
-)
+try:
+    result = detector.detect(
+        points=[(0.0, 0.0, 0.0), (1.0, 0.0, 0.0)],
+        seed_index=0,
+        options=DetectionOptions(detection_type="Auto"),
+    )
+finally:
+    detector.close()
 ```
+
+Each detector creates one native FindSurface context, reuses it for every
+detection, and releases it from `close()`.
 
 The optional parameter-window builder is exposed lazily:
 

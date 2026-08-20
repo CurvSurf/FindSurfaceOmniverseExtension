@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from itertools import count
+from threading import Lock
 
 from .findsurface_sdk.abi import vec3
 from .findsurface_sdk.constants import (
@@ -70,6 +71,17 @@ class NativeFindSurfaceProvider:
         self._ids = count(1)
         self._prepared_cache_key = None
         self._prepared_cache = None
+        self._context_lock = Lock()
+        self._context = self._sdk.create_context()
+
+    def close(self):
+        with self._context_lock:
+            context = self._context
+            self._context = None
+            self._prepared_cache_key = None
+            self._prepared_cache = None
+            if context is not None:
+                self._sdk.release_context(context)
 
     def detect(self, points, active_mask, seed_index, options, active_generation=None):
         if len(points) > MAX_POINTS:
@@ -80,17 +92,19 @@ class NativeFindSurfaceProvider:
         if not active_mask[seed_index]:
             raise ValueError("Seed point is no longer active.")
 
-        prepared = self._prepare_pointcloud(points, active_mask, active_generation)
-        active_original_indices = prepared.active_original_indices
-        try:
-            active_seed_index = prepared.active_index_by_original[seed_index]
-        except KeyError as exc:
-            raise ValueError("Seed point is no longer active.") from exc
-        feature_type = NAME_TO_FEATURE_TYPE[options.detection_type]
+        with self._context_lock:
+            context = self._context
+            if context is None:
+                raise FindSurfaceError("FindSurface provider is closed.")
 
-        context = self._sdk.create_context()
-        point_array = None
-        try:
+            prepared = self._prepare_pointcloud(points, active_mask, active_generation)
+            active_original_indices = prepared.active_original_indices
+            try:
+                active_seed_index = prepared.active_index_by_original[seed_index]
+            except KeyError as exc:
+                raise ValueError("Seed point is no longer active.") from exc
+            feature_type = NAME_TO_FEATURE_TYPE[options.detection_type]
+
             self._apply_options(context, options, active_seed_index)
             point_array = self._set_prepared_pointcloud(context, prepared)
             raw_result = self._sdk.find(context, feature_type)
@@ -103,32 +117,29 @@ class NativeFindSurfaceProvider:
             if not result_type:
                 raise FindSurfaceSdkError(f"Unsupported FindSurface result type: {raw_result.result_type}")
             flags = self._sdk.get_outlier_flags(context, prepared.point_count)
-        finally:
-            self._sdk.release_context(context)
-            point_array = None
 
-        inlier_indices = [
-            active_original_indices[index]
-            for index, flag in enumerate(flags)
-            if flag == 0 and index < len(active_original_indices)
-        ]
-        if not inlier_indices:
-            raise FindSurfaceSdkError("FindSurface returned no inlier points.")
+            inlier_indices = [
+                active_original_indices[index]
+                for index, flag in enumerate(flags)
+                if flag == 0 and index < len(active_original_indices)
+            ]
+            if not inlier_indices:
+                raise FindSurfaceSdkError("FindSurface returned no inlier points.")
 
-        inlier_points = [tuple(points[index]) for index in inlier_indices]
-        parameters = convert_raw_result(raw_result, result_type, inlier_points)
-        serial = next(self._ids)
-        return FindSurfaceResult(
-            id=f"{result_type}_{serial:03d}",
-            type=result_type,
-            seed_index=seed_index,
-            seed_position=tuple(points[seed_index]),
-            inlier_indices=inlier_indices,
-            active_generation=int(active_generation or 0),
-            measurement_accuracy=options.measurement_accuracy,
-            rms_error=float(raw_result.rms_error),
-            parameters=parameters,
-        )
+            inlier_points = [tuple(points[index]) for index in inlier_indices]
+            parameters = convert_raw_result(raw_result, result_type, inlier_points)
+            serial = next(self._ids)
+            return FindSurfaceResult(
+                id=f"{result_type}_{serial:03d}",
+                type=result_type,
+                seed_index=seed_index,
+                seed_position=tuple(points[seed_index]),
+                inlier_indices=inlier_indices,
+                active_generation=int(active_generation or 0),
+                measurement_accuracy=options.measurement_accuracy,
+                rms_error=float(raw_result.rms_error),
+                parameters=parameters,
+            )
 
     def _prepare_pointcloud(self, points, active_mask, active_generation=None):
         cache_key = None

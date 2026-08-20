@@ -190,12 +190,19 @@ points = [
 ]
 
 detector = FindSurfaceDetector()
-result = detector.detect(
-    points=points,
-    seed_index=0,
-    options=DetectionOptions(detection_type="Auto"),
-)
+try:
+    result = detector.detect(
+        points=points,
+        seed_index=0,
+        options=DetectionOptions(detection_type="Auto"),
+    )
+finally:
+    detector.close()
 ```
+
+The detector creates one native FindSurface context and serially reuses it for
+all detection calls. Call `close()` when the detector's application-level
+lifetime ends; subsequent detection calls are rejected.
 
 Signature:
 
@@ -473,7 +480,9 @@ application state, or render detection results.
 6. Call `FindSurfaceDetector.detect()`.
 7. Use `FindSurfaceResult.inlier_indices` and `FindSurfaceResult.parameters` to
    build your own visualization, capture flow, workspace, or USD export.
-8. Register and apply the USD schema helpers when writing FindSurface metadata.
+8. Call `FindSurfaceDetector.close()` when the application no longer needs the
+   detector.
+9. Register and apply the USD schema helpers when writing FindSurface metadata.
 
 Minimal detection example:
 
@@ -482,24 +491,27 @@ from findsurface.bootstrap import DetectionOptions, FindSurfaceDetector
 
 detector = FindSurfaceDetector()
 
-result = detector.detect(
-    points=my_points,
-    seed_index=my_seed_index,
-    options=DetectionOptions(
-        detection_type="Cylinder",
-        seed_radius=0.15,
-        measurement_accuracy=0.003,
-        mean_distance=0.05,
-        radial_expansion=5,
-        lateral_extension=5,
-    ),
-    active_mask=my_active_mask,
-    active_generation=my_active_generation,
-)
+try:
+    result = detector.detect(
+        points=my_points,
+        seed_index=my_seed_index,
+        options=DetectionOptions(
+            detection_type="Cylinder",
+            seed_radius=0.15,
+            measurement_accuracy=0.003,
+            mean_distance=0.05,
+            radial_expansion=5,
+            lateral_extension=5,
+        ),
+        active_mask=my_active_mask,
+        active_generation=my_active_generation,
+    )
 
-print(result.type)
-print(result.inlier_indices)
-print(result.parameters)
+    print(result.type)
+    print(result.inlier_indices)
+    print(result.parameters)
+finally:
+    detector.close()
 ```
 
 ## Test Command

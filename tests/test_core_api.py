@@ -21,6 +21,7 @@ from findsurface.bootstrap import (  # noqa: E402
 class FakeProvider:
     def __init__(self):
         self.calls = []
+        self.close_calls = 0
 
     def detect(self, points, active_mask, seed_index, options, active_generation=None):
         self.calls.append(
@@ -43,6 +44,9 @@ class FakeProvider:
             confidence=None,
             parameters={"origin": (0.0, 0.0, 0.0)},
         )
+
+    def close(self):
+        self.close_calls += 1
 
 
 class CoreApiTests(unittest.TestCase):
@@ -88,6 +92,17 @@ class CoreApiTests(unittest.TestCase):
         detector = FindSurfaceDetector(provider=FakeProvider())
         with self.assertRaises(ValueError):
             detector.detect([(0.0, 0.0, 0.0)], seed_index=0, active_mask=[True, False])
+
+    def test_detector_closes_provider_once_and_rejects_later_detection(self):
+        provider = FakeProvider()
+        detector = FindSurfaceDetector(provider=provider)
+
+        detector.close()
+        detector.close()
+
+        self.assertEqual(provider.close_calls, 1)
+        with self.assertRaisesRegex(RuntimeError, "closed"):
+            detector.detect([(0.0, 0.0, 0.0)], seed_index=0)
 
     def test_normalize_detection_options_rejects_unknown_type(self):
         with self.assertRaises(TypeError):
