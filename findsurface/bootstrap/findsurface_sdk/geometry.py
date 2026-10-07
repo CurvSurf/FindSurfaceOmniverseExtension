@@ -99,6 +99,8 @@ def calculate_elbow_joint(inlier_points, center, axis, major_radius):
     min_index = min(range(len(angles)), key=lambda index: angles[index])
     max_index = max(range(len(angles)), key=lambda index: angles[index])
     sweep_angle = absolute_angle_between(projected[min_index], projected[max_index], unit_axis)
+    if sweep_angle > 355.0 * pi / 180.0:
+        sweep_angle = 2.0 * pi
     return add(center, mul(projected[min_index], major_radius)), sweep_angle
 
 

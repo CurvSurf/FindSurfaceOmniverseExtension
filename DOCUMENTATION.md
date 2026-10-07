@@ -282,6 +282,13 @@ Result `parameters` are normalized by result type:
 | `Cone` | `origin`, `x_axis`, `y_axis`, `z_axis`, `height`, `bottom`, `top`, `bottom_radius`, `top_radius` |
 | `Torus` | `origin`, `x_axis`, `y_axis`, `z_axis`, `center`, `axis`, `major_radius`, `tube_radius`, `start_tube_center`, `sweep_angle` |
 
+Torus extent is inferred from projected inlier directions. A mean direction
+length below `0.1` yields a full ring. Otherwise, inferred sweeps strictly
+greater than 355 degrees are closed to `2*pi`; exactly 355 degrees stays partial.
+This changes only the inferred extent, not the native fit center, axis, radii,
+inlier membership, RMS, or input points. Applications should share this result
+between preview and capture rather than applying another sweep threshold.
+
 The axes are intended as a stable transform frame for app-side visualization or
 export. The extension does not create meshes or viewport objects by itself.
 

@@ -1,7 +1,7 @@
 import sys
 import types
 import unittest
-from math import pi
+from math import cos, pi, radians, sin
 from pathlib import Path
 
 
@@ -64,6 +64,32 @@ class FakeSdk:
 
 
 class NativeDetectionTests(unittest.TestCase):
+    def test_torus_sweep_closes_only_above_355_degrees(self):
+        raw = types.SimpleNamespace(torus_result=types.SimpleNamespace(
+            center=(2.0, 3.0, 4.0), axis=(0.0, 0.0, 1.0),
+            mean_radius=2.0, tube_radius=0.25))
+        for degrees in (270.0, 300.0, 354.999, 355.0, 355.001, 359.0):
+            with self.subTest(degrees=degrees):
+                half = radians(degrees / 2.0)
+                # Center samples prevent the independent mean-length <0.1 rule.
+                points = [(2.0 + 2.0 * cos(a), 3.0 + 2.0 * sin(a), 4.0)
+                          for a in (-half, half, *([0.0] * 10))]
+                original = list(points)
+                result = convert_raw_result(raw, "Torus", points)
+                expected = 2.0 * pi if degrees > 355.0 else radians(degrees)
+                self.assertAlmostEqual(result["sweep_angle"], expected, places=12)
+                self.assertEqual(result["center"], raw.torus_result.center)
+                self.assertEqual(result["axis"], raw.torus_result.axis)
+                self.assertEqual(result["major_radius"], 2.0)
+                self.assertEqual(result["tube_radius"], 0.25)
+                self.assertEqual(points, original)
+
+    def test_torus_balanced_directions_still_produce_full_sweep(self):
+        from findsurface.bootstrap.findsurface_sdk.geometry import calculate_elbow_joint
+        points = [(cos(a), sin(a), 0.0) for a in (0.0, pi / 2.0, pi, 1.5 * pi)]
+        _, sweep = calculate_elbow_joint(points, (0.0, 0.0, 0.0), (0.0, 0.0, 1.0), 1.0)
+        self.assertEqual(sweep, 2.0 * pi)
+
     def assertTupleAlmostEqual(self, actual, expected):
         self.assertEqual(len(actual), len(expected))
         for actual_value, expected_value in zip(actual, expected):
