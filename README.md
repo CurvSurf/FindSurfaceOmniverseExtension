@@ -38,6 +38,7 @@ requirements, and examples.
 These are the samples to help you get started to make your application with the library (more samples are to be added in the future):
 
 - [Omniverse Demo](https://github.com/CurvSurf/FindSurfaceOmniverseDemo)
+- [Isaac Sim Demo](https://github.com/CurvSurf/FindSurfaceIsaacSimDemo)
 
 
 ## Public Python API
