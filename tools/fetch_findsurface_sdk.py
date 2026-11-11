@@ -73,6 +73,7 @@ def acquire_sdk_release_asset(
 
     payload = (fetcher or _fetch_bytes)(url)
     actual_sha256 = hashlib.sha256(payload).hexdigest()
+    sha256 = sha256 or (config.get("sha256") or {}).get(key)
     if sha256 and actual_sha256.lower() != str(sha256).lower():
         raise SdkAcquisitionError(
             f"FindSurface SDK checksum mismatch for {key}: expected {sha256}, got {actual_sha256}."

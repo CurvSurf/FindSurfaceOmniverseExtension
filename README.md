@@ -42,6 +42,13 @@ These are the samples to help you get started to make your application with the 
 
 ## Public Python API
 
+The optional `findsurface.bootstrap.demo_launcher` module provides runtime
+validation, launch plans, independent child-process tracking, and local payload
+staging for standalone demo launchers. `demo_launcher_ui` supplies their small
+Kit window. Neither module changes the detection API or starts a demo on core
+extension activation. Demo-specific manifests, experiences, and launcher
+extensions belong to the two demo repositories; see their `LAUNCHER.md` files.
+
 Core detection symbols are available from `findsurface.bootstrap` without
 constructing any app UI:
 

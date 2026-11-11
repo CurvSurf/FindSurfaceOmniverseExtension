@@ -1,0 +1,10 @@
+{
+  "repository": "CurvSurf/FindSurfaceOmniverseExtension",
+  "release_tag": "v1.1.0",
+  "extension_id": "com.findsurface.bootstrap",
+  "kind": "core",
+  "kit_version": "110.1.2",
+  "supported_platforms": [
+    "windows-x86_64"
+  ]
+}
