@@ -33,7 +33,7 @@ class CommunityReleaseTests(unittest.TestCase):
 name="com.findsurface.bootstrap"
 title="Fixture"
 description="Fixture core"
-category="Geometry"
+category="other"
 version="1.1.0"
 repository="https://github.com/CurvSurf/Fixture"
 authors=["CurvSurf"]
@@ -76,6 +76,12 @@ platform=["windows-x86_64", "linux-x86_64"]
     def test_unapproved_platform_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "not approved"):
             tool.prepare(self.root, self.base / "built", "linux-x86_64")
+
+    def test_wrong_registry_category_is_rejected(self):
+        config = self.root / "config/extension.toml"
+        config.write_text(config.read_text().replace('category="other"', 'category="Geometry"'))
+        with self.assertRaisesRegex(ValueError, "Expected category other"):
+            tool.prepare(self.root, self.base / "built", "windows-x86_64")
 
     def test_wrong_native_architecture_is_rejected(self):
         binary = self.root / "data/native/windows-x86_64/FindSurface.dll"

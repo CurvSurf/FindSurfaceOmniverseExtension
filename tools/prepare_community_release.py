@@ -101,6 +101,9 @@ def verify_tree(stage, config, platform):
         raise ValueError(f"Unexpected top-level registry extensions: {names}")
     extension = extensions / config["extension_id"]
     metadata = verify_extension(extension, config["extension_id"])
+    expected_category = "other" if config["kind"] == "core" else "example"
+    if metadata["package"]["category"] != expected_category:
+        raise ValueError(f"Expected category {expected_category}: {extension}")
     target = metadata["package"]["target"]
     if target["platform"] != [platform] or target["kit"] != [config["kit_version"]]:
         raise ValueError("Package target is not restricted to the prepared platform and Kit version")
@@ -126,6 +129,9 @@ def verify_tree(stage, config, platform):
         main = payload / "extensions" / spec.main_extension
         if not (main / "config/extension.toml").is_file():
             raise ValueError("Demo implementation is missing")
+        main_metadata = tomllib.loads((main / "config/extension.toml").read_text(encoding="utf-8"))
+        if main_metadata["package"]["category"] != "example" or main_metadata["package"]["target"]["platform"] != [platform]:
+            raise ValueError("Bundled demo category/platform differs from its release")
         verify_native(main / "data/native" / platform / config["picker"][platform], platform)
         sdk = verify_sdk(core, platform)
     for item in stage.rglob("*"):
@@ -166,6 +172,7 @@ def prepare(project, output, platform):
     narrow_target(target, platform)
     if config["kind"] == "launcher":
         narrow_target(target / "data/payload/extensions/com.findsurface.bootstrap", platform)
+        narrow_target(target / "data/payload/extensions" / DemoSpec.read(target).main_extension, platform)
     result = verify_tree(stage, config, platform)
     name = config["repository"].replace("/", "-") + f"-{platform}-{config['release_tag']}.zip"
     archive = output / name

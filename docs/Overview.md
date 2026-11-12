@@ -4,7 +4,7 @@ Reusable detection API and USD schema resources. Enabling this extension does
 not start a demo. Version 1.1.0 also provides the shared demo launcher backend
 and optional launcher window.
 
-Requirements: Kit 110.1.2 / Python 3.12, Windows x86-64 (tested), including
+Requirements: Kit 110.1.2 / Python 3.12, Windows and Linux x86-64 (tested), including
 Isaac Sim 6.0.1. No Kit/Isaac Sim runtime is included. Other Kit versions are
 not advertised. Platform-specific archives include native SDK v1.0.1 with
 its pinned SHA-256 checksum. The two launchers require core 1.1.0 exactly.

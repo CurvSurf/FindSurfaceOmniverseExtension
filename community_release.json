@@ -5,6 +5,7 @@
   "kind": "core",
   "kit_version": "110.1.2",
   "supported_platforms": [
-    "windows-x86_64"
+    "windows-x86_64",
+    "linux-x86_64"
   ]
 }
