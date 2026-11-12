@@ -1,4 +1,7 @@
 import ctypes
+import hashlib
+import io
+import os
 import sys
 import tempfile
 import types
@@ -82,6 +85,38 @@ class SdkWrapperTests(unittest.TestCase):
         message = str(context.exception)
         self.assertIn("FindSurface native library was not found", message)
         self.assertIn(str(missing_path), message)
+
+    def test_first_use_downloads_verifies_loads_and_reuses_existing_sdk(self):
+        for platform_name, filename in [("Windows", "FindSurface.dll"), ("Linux", "libFindSurface.so")]:
+            with self.subTest(platform=platform_name), tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / filename
+                payload = b"verified SDK fixture"
+                with patch.object(wrapper, "default_library_path", return_value=path), \
+                     patch.object(wrapper.platform, "system", return_value=platform_name), \
+                     patch.dict(os.environ, {"FINDSURFACE_SDK_AUTO_DOWNLOAD": "1"}), \
+                     patch.object(wrapper, "_expected_sha256", return_value=hashlib.sha256(payload).hexdigest()), \
+                     patch.object(wrapper.urllib.request, "urlopen", return_value=io.BytesIO(payload)) as download, \
+                     patch.object(wrapper.ctypes, "CDLL") as load, \
+                     patch.object(wrapper.FindSurfaceSdk, "_bind_functions"):
+                    wrapper.FindSurfaceSdk()
+                    self.assertEqual(path.read_bytes(), payload)
+                    self.assertTrue(download.call_args.args[0].full_url.endswith("/v1.0.1/" + filename))
+                    load.assert_called_with(str(path))
+                    wrapper.FindSurfaceSdk()
+                    self.assertEqual(download.call_count, 1)
+
+    def test_bad_download_is_not_saved_or_loaded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "FindSurface.dll"
+            with patch.object(wrapper, "default_library_path", return_value=path), \
+                 patch.dict(os.environ, {"FINDSURFACE_SDK_AUTO_DOWNLOAD": "1"}), \
+                 patch.object(wrapper, "_expected_sha256", return_value="0" * 64), \
+                 patch.object(wrapper.urllib.request, "urlopen", return_value=io.BytesIO(b"bad")), \
+                 patch.object(wrapper.ctypes, "CDLL") as load:
+                with self.assertRaisesRegex(wrapper.FindSurfaceSdkError, "checksum mismatch"):
+                    wrapper.FindSurfaceSdk()
+                self.assertFalse(path.exists())
+                load.assert_not_called()
 
 
 if __name__ == "__main__":

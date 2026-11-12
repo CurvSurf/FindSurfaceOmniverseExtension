@@ -236,7 +236,7 @@ def _expected_sha256(asset_key):
     if os.environ.get("FINDSURFACE_SDK_SHA256"):
         return os.environ["FINDSURFACE_SDK_SHA256"]
     env_name = "FINDSURFACE_SDK_SHA256_" + asset_key.upper().replace("-", "_")
-    return os.environ.get(env_name)
+    return os.environ.get(env_name) or (_release_config().get("sha256") or {}).get(asset_key)
 
 
 def _download_headers():

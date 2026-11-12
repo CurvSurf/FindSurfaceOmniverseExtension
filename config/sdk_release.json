@@ -1,6 +1,10 @@
 {
   "release_base_url": "https://github.com/CurvSurf/FindSurfaceOmniverseExtension/releases/download",
-  "release_tag": "v1.0.0",
+  "release_tag": "v1.0.1",
+  "sha256": {
+    "windows-x86_64": "8d380af517766ad33fae42404cfa81fc087b35ee9dfcfc3a67ab8cb02b9558ed",
+    "linux-x86_64": "35a1ce7960d07434d6865ed3d1450bd9989e90c2e215eafbbd3aa13eb6f9638d"
+  },
   "assets": {
     "windows-x86_64": "FindSurface.dll",
     "linux-x86_64": "libFindSurface.so"

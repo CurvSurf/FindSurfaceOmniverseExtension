@@ -43,6 +43,13 @@ These are the samples to help you get started to make your application with the 
 
 ## Public Python API
 
+The optional `findsurface.bootstrap.demo_launcher` module provides runtime
+validation, launch plans, independent child-process tracking, and local payload
+staging for standalone demo launchers. `demo_launcher_ui` supplies their small
+Kit window. Neither module changes the detection API or starts a demo on core
+extension activation. Demo-specific manifests, experiences, and launcher
+extensions belong to the two demo repositories; see their `LAUNCHER.md` files.
+
 Core detection symbols are available from `findsurface.bootstrap` without
 constructing any app UI:
 
@@ -147,3 +154,14 @@ The Python portions of this repository are separate from the native FindSurface
 SDK binary. The FindSurface SDK is owned by CurvSurf, Inc.; refer to CurvSurf's
 FindSurface repositories and release terms for SDK licensing, platform support,
 point-count limits, and commercial-use requirements.
+
+## Registry SDK delivery
+
+Registry ZIPs exclude FindSurface.dll and libFindSurface.so. Both direct core
+users and Extension Manager installations use the same default SDK wrapper:
+first SDK use downloads the version and asset pinned in config/sdk_release.json,
+verifies SHA-256, and saves it under data/native/<platform>. Existing files are
+reused without downloading. Activation alone only registers USD schemas.
+An explicit SDK path bypasses automatic acquisition; FINDSURFACE_SDK_AUTO_DOWNLOAD=0
+disables it. The initial acquisition needs network access and write access to the
+extension data directory. Picker binaries are independent app-owned build artifacts.

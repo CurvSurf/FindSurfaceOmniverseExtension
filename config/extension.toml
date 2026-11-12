@@ -1,9 +1,20 @@
 [package]
-version = "1.0.0"
+version = "1.1.0"
+name = "com.findsurface.bootstrap"
+authors = ["CurvSurf, Inc."]
+repository = "https://github.com/CurvSurf/FindSurfaceOmniverseExtension"
+readme = "docs/Overview.md"
+changelog = "docs/CHANGELOG.md"
+icon = "data/icon.svg"
+preview_image = "data/preview.svg"
 title = "FindSurface Omniverse Core"
 description = "Reusable FindSurface native SDK wrapper, detection core API, optional parameter window utility, and USD schema resources for Omniverse Kit."
-category = "Geometry"
-keywords = ["findsurface", "geometry-detection", "native-sdk", "usd-schema"]
+category = "other"
+keywords = ["findsurface", "curvsurf", "geometry", "detection", "pointcloud", "cad", "3d-data-processing"]
+
+[package.target]
+kit = ["110.1.2"]
+platform = ["windows-x86_64", "linux-x86_64"]
 
 [dependencies]
 "omni.ui" = {}
