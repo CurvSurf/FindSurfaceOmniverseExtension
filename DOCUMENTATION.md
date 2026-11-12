@@ -100,6 +100,18 @@ Windows: exts/com.findsurface.bootstrap/data/native/windows-x86_64/FindSurface.d
 Linux:   exts/com.findsurface.bootstrap/data/native/linux-x86_64/libFindSurface.so
 ```
 
+## Threading
+
+The native FindSurface SDK does **not** support concurrent detection calls. This
+is an intentional SDK limitation: if a second thread starts a detection while
+another detection is in progress, both detections can fail.
+
+This extension therefore does not provide a thread-safe detection API or
+internally queue concurrent requests. Applications must serialize every
+`FindSurfaceDetector.detect()` call so that only one FindSurface detection is
+running at a time. Treat this as a process-wide requirement, including when
+using multiple detector or provider instances.
+
 ## Public Python API
 
 Import the core API from `findsurface.bootstrap`:
@@ -269,6 +281,13 @@ Result `parameters` are normalized by result type:
 | `Cylinder` | `origin`, `x_axis`, `y_axis`, `z_axis`, `height`, `bottom`, `top`, `radius` |
 | `Cone` | `origin`, `x_axis`, `y_axis`, `z_axis`, `height`, `bottom`, `top`, `bottom_radius`, `top_radius` |
 | `Torus` | `origin`, `x_axis`, `y_axis`, `z_axis`, `center`, `axis`, `major_radius`, `tube_radius`, `start_tube_center`, `sweep_angle` |
+
+Torus extent is inferred from projected inlier directions. A mean direction
+length below `0.1` yields a full ring. Otherwise, inferred sweeps strictly
+greater than 355 degrees are closed to `2*pi`; exactly 355 degrees stays partial.
+This changes only the inferred extent, not the native fit center, axis, radii,
+inlier membership, RMS, or input points. Applications should share this result
+between preview and capture rather than applying another sweep threshold.
 
 The axes are intended as a stable transform frame for app-side visualization or
 export. The extension does not create meshes or viewport objects by itself.

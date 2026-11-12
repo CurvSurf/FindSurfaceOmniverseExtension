@@ -30,12 +30,15 @@ It also provides an optional `omni.ui` FindSurface parameter-window utility.
 Apps may choose to use that utility, or they may build their own parameter UI
 and call the core detection API directly.
 
+See [DOCUMENTATION.md](DOCUMENTATION.md) for the full API reference, usage
+requirements, and examples.
 
 ## Samples
 
 These are the samples to help you get started to make your application with the library (more samples are to be added in the future):
 
 - [Omniverse Demo](https://github.com/CurvSurf/FindSurfaceOmniverseDemo)
+- [Isaac Sim Demo](https://github.com/CurvSurf/FindSurfaceIsaacSimDemo)
 
 
 ## Public Python API
