@@ -10,7 +10,7 @@ preview_image = "data/preview.svg"
 title = "FindSurface Omniverse Core"
 description = "Reusable FindSurface native SDK wrapper, detection core API, optional parameter window utility, and USD schema resources for Omniverse Kit."
 category = "other"
-keywords = ["findsurface", "geometry-detection", "native-sdk", "usd-schema"]
+keywords = ["findsurface", "curvsurf", "geometry", "detection", "pointcloud", "cad", "3d-data-processing"]
 
 [package.target]
 kit = ["110.1.2"]

@@ -21,6 +21,7 @@ PLATFORMS = ("windows-x86_64", "linux-x86_64")
 EXCLUDE = {".git", ".agents", ".codex", ".aws", ".installation", ".artifacts",
            "__pycache__", ".pytest_cache", "tests", "tools", "premake5.lua",
            ".gitattributes", ".gitignore", "community_release.json"}
+SDK_FILENAMES = {"FindSurface.dll", "libFindSurface.so"}
 EXCLUDE_SUFFIXES = {".pyc", ".pdb", ".lib", ".exp", ".a", ".log"}
 
 
@@ -34,7 +35,7 @@ def read_config(root):
 
 def clean_tree(root, platform):
     for item in sorted(root.rglob("*"), key=lambda p: len(p.parts), reverse=True):
-        if item.name in EXCLUDE or item.name in (set(PLATFORMS) - {platform}) or item.suffix in EXCLUDE_SUFFIXES:
+        if item.name in SDK_FILENAMES or item.name in EXCLUDE or item.name in (set(PLATFORMS) - {platform}) or item.suffix in EXCLUDE_SUFFIXES:
             if item.is_dir():
                 shutil.rmtree(item)
             else:
@@ -87,11 +88,18 @@ def verify_native(path, platform):
 
 def verify_sdk(core, platform):
     policy = json.loads((core / "config/sdk_release.json").read_text(encoding="utf-8"))
-    sdk = core / "data/native" / platform / policy["assets"][platform]
-    verify_native(sdk, platform)
-    if digest(sdk) != policy["sha256"][platform]:
-        raise ValueError(f"SDK checksum does not match pinned release: {sdk}")
-    return {"release": policy["release_tag"], "sha256": digest(sdk)}
+    # The SDK is acquired at first use, never shipped in registry archives.
+    if not policy.get("release_base_url", "").startswith("https://") or not policy.get("release_tag"):
+        raise ValueError("Missing SDK download release URL/tag")
+    expected_name = "FindSurface.dll" if platform == "windows-x86_64" else "libFindSurface.so"
+    if policy.get("assets", {}).get(platform) != expected_name:
+        raise ValueError("Unexpected SDK download asset")
+    checksum = policy.get("sha256", {}).get(platform, "")
+    if not re.fullmatch(r"[0-9a-fA-F]{64}", checksum):
+        raise ValueError("Missing/invalid SDK download SHA256")
+    if any(item.name in SDK_FILENAMES for item in core.rglob("*")):
+        raise ValueError("SDK binary must not be bundled in registry archives")
+    return {"release": policy["release_tag"], "sha256": checksum, "delivery": "download-on-first-use"}
 
 
 def verify_tree(stage, config, platform):
@@ -135,6 +143,8 @@ def verify_tree(stage, config, platform):
         verify_native(main / "data/native" / platform / config["picker"][platform], platform)
         sdk = verify_sdk(core, platform)
     for item in stage.rglob("*"):
+        if item.name in SDK_FILENAMES:
+            raise ValueError(f"SDK binary must not be bundled: {item}")
         if item.name in EXCLUDE or item.suffix in EXCLUDE_SUFFIXES:
             raise ValueError(f"Development artifact in archive: {item}")
         if item.name in (set(PLATFORMS) - {platform}):

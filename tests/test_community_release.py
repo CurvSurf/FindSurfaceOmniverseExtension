@@ -57,7 +57,7 @@ platform=["windows-x86_64", "linux-x86_64"]
         native = self.root / "data/native/windows-x86_64/FindSurface.dll"
         native.parent.mkdir(parents=True)
         native.write_bytes(pe)
-        (self.root / "config/sdk_release.json").write_text(json.dumps({"release_tag": "v1.0.1", "assets": {"windows-x86_64": "FindSurface.dll"}, "sha256": {"windows-x86_64": hashlib.sha256(pe).hexdigest()}}))
+        (self.root / "config/sdk_release.json").write_text(json.dumps({"release_base_url": "https://github.com/CurvSurf/FindSurfaceOmniverseExtension/releases/download", "release_tag": "v1.0.1", "assets": {"windows-x86_64": "FindSurface.dll"}, "sha256": {"windows-x86_64": hashlib.sha256(pe).hexdigest()}}))
 
     def test_reproducible_archive_excludes_private_and_development_files(self):
         first = tool.prepare(self.root, self.base / "first", "windows-x86_64")
@@ -83,18 +83,23 @@ platform=["windows-x86_64", "linux-x86_64"]
         with self.assertRaisesRegex(ValueError, "Expected category other"):
             tool.prepare(self.root, self.base / "built", "windows-x86_64")
 
-    def test_wrong_native_architecture_is_rejected(self):
-        binary = self.root / "data/native/windows-x86_64/FindSurface.dll"
-        pe = bytearray(binary.read_bytes())
-        struct.pack_into("<H", pe, 68, 0x14c)
-        binary.write_bytes(pe)
-        with self.assertRaisesRegex(ValueError, "x86-64"):
-            tool.prepare(self.root, self.base / "built", "windows-x86_64")
+    def test_missing_sdk_binary_can_be_packaged(self):
+        (self.root / "data/native/windows-x86_64/FindSurface.dll").unlink()
+        archive = tool.prepare(self.root, self.base / "built", "windows-x86_64")
+        self.assertEqual(tool.verify_archive(archive.parent)["sdk"]["delivery"], "download-on-first-use")
 
-    def test_unknown_sdk_bytes_are_rejected(self):
-        binary = self.root / "data/native/windows-x86_64/FindSurface.dll"
-        binary.write_bytes(binary.read_bytes() + b"unknown SDK")
-        with self.assertRaisesRegex(ValueError, "SDK checksum"):
+    def test_existing_sdk_binary_is_excluded_even_if_not_release_bytes(self):
+        (self.root / "data/native/windows-x86_64/FindSurface.dll").write_bytes(b"local development SDK")
+        archive = tool.prepare(self.root, self.base / "built", "windows-x86_64")
+        with zipfile.ZipFile(archive) as zipped:
+            self.assertFalse(any(Path(n).name in tool.SDK_FILENAMES for n in zipped.namelist()))
+
+    def test_missing_download_checksum_is_rejected(self):
+        path = self.root / "config/sdk_release.json"
+        policy = json.loads(path.read_text())
+        policy["sha256"] = {}
+        path.write_text(json.dumps(policy))
+        with self.assertRaisesRegex(ValueError, "SDK download SHA256"):
             tool.prepare(self.root, self.base / "built", "windows-x86_64")
 
 

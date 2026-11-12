@@ -153,3 +153,14 @@ The Python portions of this repository are separate from the native FindSurface
 SDK binary. The FindSurface SDK is owned by CurvSurf, Inc.; refer to CurvSurf's
 FindSurface repositories and release terms for SDK licensing, platform support,
 point-count limits, and commercial-use requirements.
+
+## Registry SDK delivery
+
+Registry ZIPs exclude FindSurface.dll and libFindSurface.so. Both direct core
+users and Extension Manager installations use the same default SDK wrapper:
+first SDK use downloads the version and asset pinned in config/sdk_release.json,
+verifies SHA-256, and saves it under data/native/<platform>. Existing files are
+reused without downloading. Activation alone only registers USD schemas.
+An explicit SDK path bypasses automatic acquisition; FINDSURFACE_SDK_AUTO_DOWNLOAD=0
+disables it. The initial acquisition needs network access and write access to the
+extension data directory. Picker binaries are independent app-owned build artifacts.
