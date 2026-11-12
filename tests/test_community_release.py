@@ -29,6 +29,7 @@ class CommunityReleaseTests(unittest.TestCase):
             (self.root / name).mkdir()
         (self.root / ".agents/private.txt").write_text("must not be packaged")
         (self.root / "tests/test_fixture.py").touch()
+        (self.root / "COMMUNITY_REGISTRY.md").write_text("Maintainer release procedures")
         config = '''[package]
 name="com.findsurface.bootstrap"
 title="Fixture"
@@ -65,7 +66,7 @@ platform=["windows-x86_64", "linux-x86_64"]
         self.assertEqual(first.name, "CurvSurf-Fixture-windows-x86_64-v1.1.0.zip")
         self.assertEqual(first.read_bytes(), second.read_bytes())
         with zipfile.ZipFile(first) as zipped:
-            self.assertFalse(any(".agents" in name or "/tests/" in name for name in zipped.namelist()))
+            self.assertFalse(any(".agents" in name or "/tests/" in name or name.endswith("COMMUNITY_REGISTRY.md") for name in zipped.namelist()))
 
     def test_modified_archive_is_rejected(self):
         archive = tool.prepare(self.root, self.base / "built", "windows-x86_64")

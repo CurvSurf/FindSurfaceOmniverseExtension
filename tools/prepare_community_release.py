@@ -20,7 +20,7 @@ from findsurface.bootstrap.demo_launcher import DemoSpec, stage_launcher
 PLATFORMS = ("windows-x86_64", "linux-x86_64")
 EXCLUDE = {".git", ".agents", ".codex", ".aws", ".installation", ".artifacts",
            "__pycache__", ".pytest_cache", "tests", "tools", "premake5.lua",
-           ".gitattributes", ".gitignore", "community_release.json"}
+           ".gitattributes", ".gitignore", "community_release.json", "COMMUNITY_REGISTRY.md"}
 SDK_FILENAMES = {"FindSurface.dll", "libFindSurface.so"}
 EXCLUDE_SUFFIXES = {".pyc", ".pdb", ".lib", ".exp", ".a", ".log"}
 
