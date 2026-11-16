@@ -6,7 +6,7 @@
 
 ## Overview
 
-FindSurface Omniverse Extension provides the `com.findsurface.bootstrap` Kit
+FindSurface Omniverse Extension provides the `curvsurf.findsurface.core` Kit
 extension. It is the Omniverse-side wrapper around the native FindSurface SDK:
 it loads the native SDK through Python `ctypes`, exposes a small Python
 detection API, and registers the FindSurface USD schema resources used by apps
@@ -99,7 +99,7 @@ When this repository is used as a submodule by the demo app, it should be
 checked out at:
 
 ```text
-FindSurface_Omniverse/source/extensions/com.findsurface.bootstrap
+FindSurface_Omniverse/source/extensions/curvsurf.findsurface.core
 ```
 
 ## Native SDK libraries

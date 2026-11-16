@@ -22,7 +22,7 @@ async def check():
     if not output:
         app.post_quit(1)
         raise ValueError("Set /findsurface/communityVerification/output to a local report path")
-    names = settings.get(root + "/extensions") or ["com.findsurface.bootstrap"]
+    names = settings.get(root + "/extensions") or ["curvsurf.findsurface.core"]
     report = {"published": False, "checks": {}}
     try:
         for _ in range(10):

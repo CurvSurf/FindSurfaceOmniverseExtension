@@ -120,12 +120,12 @@ def verify_tree(stage, config, platform):
     else:
         spec = DemoSpec.read(extension)
         dependencies = metadata.get("dependencies", {})
-        core_dependency = dependencies.get("com.findsurface.bootstrap", {})
-        if spec.main_extension in dependencies or core_dependency != {"version": "1.1.0", "exact": True}:
-            raise ValueError("Launcher must require core 1.1.0 without enabling the demo in the host")
+        core_dependency = dependencies.get("curvsurf.findsurface.core", {})
+        if spec.main_extension in dependencies or core_dependency != {"version": "1.1.1", "exact": True}:
+            raise ValueError("Launcher must require core 1.1.1 without enabling the demo in the host")
         payload = extension / "data/payload"
-        core = payload / "extensions/com.findsurface.bootstrap"
-        core_metadata = verify_extension(core, "com.findsurface.bootstrap")
+        core = payload / "extensions/curvsurf.findsurface.core"
+        core_metadata = verify_extension(core, "curvsurf.findsurface.core")
         if core_metadata["package"]["version"] != core_dependency["version"]:
             raise ValueError("Payload core version differs from the host dependency")
         # Kit permits its appended generated version-lock table to reopen a
@@ -181,7 +181,7 @@ def prepare(project, output, platform):
     clean_tree(stage, platform)
     narrow_target(target, platform)
     if config["kind"] == "launcher":
-        narrow_target(target / "data/payload/extensions/com.findsurface.bootstrap", platform)
+        narrow_target(target / "data/payload/extensions/curvsurf.findsurface.core", platform)
         narrow_target(target / "data/payload/extensions" / DemoSpec.read(target).main_extension, platform)
     result = verify_tree(stage, config, platform)
     name = config["repository"].replace("/", "-") + f"-{platform}-{config['release_tag']}.zip"

@@ -21,11 +21,11 @@ class DemoLauncherTests(unittest.TestCase):
         self.launcher.joinpath("config").mkdir(parents=True)
         self.spec = DemoSpec("test.launcher", "Demo", "test.demo", "demo.kit", "kit", "110.1.2")
         self.launcher.joinpath("config/demo.json").write_text(json.dumps(self.spec.__dict__))
-        self.launcher.joinpath("config/extension.toml").write_text('[dependencies]\n"com.findsurface.bootstrap" = {}\n')
+        self.launcher.joinpath("config/extension.toml").write_text('[dependencies]\n"curvsurf.findsurface.core" = {}\n')
         apps = self.project / "source/apps"
         apps.mkdir()
         apps.joinpath("demo.kit").write_text('[dependencies]\n"test.demo" = {}\n')
-        for name in ("test.demo", "com.findsurface.bootstrap"):
+        for name in ("test.demo", "curvsurf.findsurface.core"):
             folder = self.project / "source/extensions" / name / "config"
             folder.mkdir(parents=True)
             folder.joinpath("extension.toml").write_text('[package]\nversion="1.0.0"\n')

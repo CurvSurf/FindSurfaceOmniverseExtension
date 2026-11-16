@@ -3,7 +3,7 @@
 This document describes how to use the reusable `FindSurfaceExtension`
 repository independently from the FindSurface Omniverse demo app.
 
-The extension package is `com.findsurface.bootstrap`. It provides:
+The extension package is `curvsurf.findsurface.core`. It provides:
 
 - A Python facade over the native FindSurface SDK.
 - Result dataclasses and geometry parameter conversion helpers.
@@ -47,7 +47,7 @@ Then enable or depend on the Kit extension:
 
 ```toml
 [dependencies]
-"com.findsurface.bootstrap" = {}
+"curvsurf.findsurface.core" = {}
 ```
 
 The package metadata lives in:
@@ -96,8 +96,8 @@ binary manually at the path shown above. In a thin package, the same files
 belong under:
 
 ```text
-Windows: exts/com.findsurface.bootstrap/data/native/windows-x86_64/FindSurface.dll
-Linux:   exts/com.findsurface.bootstrap/data/native/linux-x86_64/libFindSurface.so
+Windows: exts/curvsurf.findsurface.core/data/native/windows-x86_64/FindSurface.dll
+Linux:   exts/curvsurf.findsurface.core/data/native/linux-x86_64/libFindSurface.so
 ```
 
 ## Threading
@@ -478,8 +478,8 @@ application state, or render detection results.
 ## Minimal App Integration Pattern
 
 1. Check out this repository under a Kit extension folder, for example
-   `source/extensions/com.findsurface.bootstrap`.
-2. Add a dependency on `com.findsurface.bootstrap`.
+   `source/extensions/curvsurf.findsurface.core`.
+2. Add a dependency on `curvsurf.findsurface.core`.
 3. Ensure the native SDK library exists at the expected path or inject a custom
    `FindSurfaceSdk`.
 4. Let your app load or generate point coordinates.

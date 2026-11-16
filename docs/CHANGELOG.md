@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2026-11-16
+
+- Rename the Kit extension ID to `curvsurf.findsurface.core`.
+- Preserve the public Python API under `findsurface.bootstrap`.
+- Keep SDK v1.0.1 download-on-first-use; SDK binaries are not bundled.
+
 ## [1.1.0] - 2026-11-12
 
 - Add shared standalone-demo launcher support without starting a demo on core activation.

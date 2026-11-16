@@ -105,7 +105,7 @@ def make_launch_plan(launcher_root: Path, requested: str = "", extra_args=()) ->
     payload = payload_root(launcher_root)
     experience = payload / "apps" / spec.experience
     extensions = payload / "extensions"
-    for item in (experience, extensions / spec.main_extension / "config/extension.toml", extensions / "com.findsurface.bootstrap/config/extension.toml"):
+    for item in (experience, extensions / spec.main_extension / "config/extension.toml", extensions / "curvsurf.findsurface.core/config/extension.toml"):
         if not item.is_file():
             raise ValueError(f"Required demo payload file is missing: {item}")
     root, executable = discover_runtime(launcher_root, spec, requested)
@@ -131,7 +131,7 @@ def make_launch_plan(launcher_root: Path, requested: str = "", extra_args=()) ->
 def local_sdk(payload: Path) -> Path | None:
     platform = "windows-x86_64" if os.name == "nt" else "linux-x86_64"
     filename = "FindSurface.dll" if os.name == "nt" else "libFindSurface.so"
-    sdk = payload / "extensions/com.findsurface.bootstrap/data/native" / platform / filename
+    sdk = payload / "extensions/curvsurf.findsurface.core/data/native" / platform / filename
     # Match Start_Demo's explicitly recorded private/external SDK selection.
     manifest = payload.parent / ".installation/manifest.json"
     if payload.name == "source" and manifest.is_file():
@@ -184,13 +184,13 @@ def stage_launcher(project: Path, launcher_id: str, destination: Path) -> Path:
     payload = destination / "data/payload"
     (payload / "apps").mkdir(parents=True)
     shutil.copy2(project / "source/apps" / spec.experience, payload / "apps" / spec.experience)
-    for name in (spec.main_extension, "com.findsurface.bootstrap"):
+    for name in (spec.main_extension, "curvsurf.findsurface.core"):
         shutil.copytree(project / "source/extensions" / name, payload / "extensions" / name, ignore=ignore)
     sdk = local_sdk(project / "source")
     if sdk is not None:
         platform = "windows-x86_64" if os.name == "nt" else "linux-x86_64"
         filename = "FindSurface.dll" if os.name == "nt" else "libFindSurface.so"
-        target = payload / "extensions/com.findsurface.bootstrap/data/native" / platform / filename
+        target = payload / "extensions/curvsurf.findsurface.core/data/native" / platform / filename
         target.parent.mkdir(parents=True, exist_ok=True)
         if sdk.resolve() != target.resolve():
             shutil.copy2(sdk, target)

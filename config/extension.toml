@@ -1,6 +1,6 @@
 [package]
-version = "1.1.0"
-name = "com.findsurface.bootstrap"
+version = "1.1.1"
+name = "curvsurf.findsurface.core"
 authors = ["CurvSurf, Inc."]
 repository = "https://github.com/CurvSurf/FindSurfaceOmniverseExtension"
 readme = "docs/Overview.md"

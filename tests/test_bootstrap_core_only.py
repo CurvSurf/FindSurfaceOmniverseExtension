@@ -157,7 +157,7 @@ class BootstrapCoreOnlyTests(unittest.TestCase):
         calls = []
         extension._register_usd_schema_plugin = lambda: calls.append("schema")
 
-        extension.on_startup("com.findsurface.bootstrap")
+        extension.on_startup("curvsurf.findsurface.core")
         extension.on_shutdown()
 
         self.assertEqual(calls, ["schema"])
@@ -170,7 +170,7 @@ class BootstrapCoreOnlyTests(unittest.TestCase):
         calls = []
         extension._register_usd_schema_plugin = lambda: calls.append("schema")
 
-        extension.on_startup("com.findsurface.bootstrap")
+        extension.on_startup("curvsurf.findsurface.core")
         extension.on_shutdown()
 
         self.assertEqual(calls, ["schema"])

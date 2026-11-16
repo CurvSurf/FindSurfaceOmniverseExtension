@@ -23,7 +23,7 @@ class CommunityReleaseTests(unittest.TestCase):
         self.base = Path(self.temp.name)
         self.root = self.base / "source"
         self.root.mkdir()
-        self.config = dict(repository="CurvSurf/Fixture", release_tag="v1.1.0", extension_id="com.findsurface.bootstrap", kind="core", kit_version="110.1.2")
+        self.config = dict(repository="CurvSurf/Fixture", release_tag="v1.1.1", extension_id="curvsurf.findsurface.core", kind="core", kit_version="110.1.2")
         (self.root / "community_release.json").write_text(json.dumps(self.config))
         for name in ("config", "docs", "data", "findsurface", ".agents", "tests"):
             (self.root / name).mkdir()
@@ -31,11 +31,11 @@ class CommunityReleaseTests(unittest.TestCase):
         (self.root / "tests/test_fixture.py").touch()
         (self.root / "COMMUNITY_REGISTRY.md").write_text("Maintainer release procedures")
         config = '''[package]
-name="com.findsurface.bootstrap"
+name="curvsurf.findsurface.core"
 title="Fixture"
 description="Fixture core"
 category="other"
-version="1.1.0"
+version="1.1.1"
 repository="https://github.com/CurvSurf/Fixture"
 authors=["CurvSurf"]
 keywords=["findsurface"]
@@ -49,7 +49,7 @@ platform=["windows-x86_64", "linux-x86_64"]
 '''
         (self.root / "config/extension.toml").write_text(config)
         for rel in ("docs/Overview.md", "docs/CHANGELOG.md", "data/icon.svg", "data/preview.svg"):
-            (self.root / rel).write_text("1.1.0")
+            (self.root / rel).write_text("1.1.1")
         pe = bytearray(128)
         pe[:2] = b"MZ"
         struct.pack_into("<I", pe, 60, 64)
@@ -63,7 +63,7 @@ platform=["windows-x86_64", "linux-x86_64"]
     def test_reproducible_archive_excludes_private_and_development_files(self):
         first = tool.prepare(self.root, self.base / "first", "windows-x86_64")
         second = tool.prepare(self.root, self.base / "second", "windows-x86_64")
-        self.assertEqual(first.name, "CurvSurf-Fixture-windows-x86_64-v1.1.0.zip")
+        self.assertEqual(first.name, "CurvSurf-Fixture-windows-x86_64-v1.1.1.zip")
         self.assertEqual(first.read_bytes(), second.read_bytes())
         with zipfile.ZipFile(first) as zipped:
             self.assertFalse(any(".agents" in name or "/tests/" in name or name.endswith("COMMUNITY_REGISTRY.md") for name in zipped.namelist()))
